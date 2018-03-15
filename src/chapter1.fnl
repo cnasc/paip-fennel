@@ -17,13 +17,13 @@
 ;; So let's define one:
 (set append
      (fn [...] ; [1]
-         "Return a new table containing the concatenation of all tables in `...`"
-         (let [result []
-               tbls [ ... ]] ; [2]
-           (each [i tbl (ipairs tbls)] 
-                 (each [i val (ipairs tbl)] 
-                       (table.insert result val)))
-           result)))
+       "Return a new table containing the concatenation of all tables in `...`"
+       (let [result []
+             tbls [ ... ]] ; [2]
+         (each [i tbl (ipairs tbls)] 
+           (each [i val (ipairs tbl)] 
+             (table.insert result val)))
+         result)))
 
 ;; [1] `...` is a special parameter that allows you to pass many
 ;; arguments
@@ -51,12 +51,20 @@
 (print (. p 1)) ;; => "John" (by the way, array-like tables are indexed from 1)
 
 (set copy (fn [tbl]
-              (let [result []]
-                (each [i v (ipairs tbl)]
-                      (table.insert result v))
-                result)))
+            (let [result []]
+              (each [i v (ipairs tbl)]
+                (table.insert result v))
+              result)))
 
 (set cons (fn [val tbl]
-              (let [result (copy tbl)]
-                (table.insert result 1 val)
-                result)))
+            (let [result (copy tbl)]
+              (table.insert result 1 val)
+              result)))
+
+;; 1.7 Higher Order Functions There is no mapcar (or map) in
+;; Lua/Fennel, best practice is probably to use a library, but just
+;; for fun we'll implement a basic (only operates on one table)
+;; version of it
+
+(set map (fn [f tbl]
+           ))
