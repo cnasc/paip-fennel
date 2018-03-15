@@ -61,10 +61,36 @@
               (table.insert result 1 val)
               result)))
 
-;; 1.7 Higher Order Functions There is no mapcar (or map) in
-;; Lua/Fennel, best practice is probably to use a library, but just
-;; for fun we'll implement a basic (only operates on one table)
-;; version of it
+;; 1.7 Higher Order Functions
+;; There is no mapcar (or map) in Lua/Fennel; best practice is
+;; probably to use a library, but just for fun we'll implement a basic
+;; (only operates on one table) version of it
 
 (set map (fn [f tbl]
-           ))
+           "Creates a new table from the results of applying `f` to each element of tbl"
+           (let [result []]
+             (each [i v (ipairs tbl)]
+               (table.insert result (f v)))
+             result)))
+
+(set mappend (fn [f tbl]
+               "Apply f to each element of the list and append the results"
+               (append (table.unpack (map f tbl)))))
+
+(set self-and-double (fn [x]
+                       [ x (+ x x) ]))
+
+(inspect (map self-and-double [1 10 300])) ; => { { 1, 2 }, { 10, 20 }, { 300, 600 } }
+(inspect (mappend self-and-double [1 10 300])) ; => { 1, 2, 10, 20, 300, 600 }
+
+;; EXERCISE:
+;; Given a list of elements, return a list consisting of all the
+;; numbers in the original list and the negation of those numbers.
+
+(set number-and-negation (fn [x]
+                           (if (= (type x) :number)
+                             [ x (- x) ]
+                             [])))
+
+(inspect (mappend number-and-negation [:testing 1 2 3 :test])) ; => { 1, -1, 2, -2, 3, -3 }
+
