@@ -161,10 +161,8 @@
      (fn [needle haystack]
        (let [result 0]
          (each [i v (ipairs haystack)]
-           (if (= v needle)
-             (set result (+ result 1))
-             (table? v)
-             (set result (+ result (count-anywhere needle v)))))
+           (if (= v needle) (set result (+ result 1))
+               (table? v) (set result (+ result (count-anywhere needle v)))))
          result)))
 
 ;; See that each pattern in these last 2? Good spot for a dolist-esque macro. TODO
@@ -178,3 +176,23 @@
          (for [i 1 (# s1)]
            (set result (+ result (* (. s1 i) (. s2 i)))))
          result)))
+
+|# 
+
+Thoughts after one chapter:
+
+Fennel is a cool language. It is also a very different language from
+Common Lisp (of course).
+Key differences:
+- Very small standard library (both a strength and a liability)
+- This implies no mapcar, remove-if-not, and friends without
+  using a library or rolling your own.
+- Iteration over tables is much better supported than recursion
+- I used the fn style of function declaration, which pretty much
+  translates 1:1 to Lua's function declaration. Apparently the
+  lambda style has some runtime overhead. How much? Would be 
+  interesting to benchmark them.
+  What should the idiom be? Prefer lambda for safety and only
+  drop down to fn for frequently called functions after profiling?
+
+#|
