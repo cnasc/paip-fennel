@@ -130,9 +130,10 @@
 ;; Lua/Fennel has proper tail calls!
 (set power-tail
      (fn [b e ?acc]
-       (if (<= e 0)
-         (or ?acc 1)
-         (power-tail b (- e 1) (* (or ?acc 1) b)))))
+       (if (<= e 0) (or ?acc 1)
+           (even? e) (let [x (power-tail b (/ e 2))]
+                       (* x x (or ?acc 1)))
+           :else (power-tail b (- e 1) (* (or ?acc 1) b)))))
 
 
 ;; 1.3 Write a function that counts the number of atoms in an
