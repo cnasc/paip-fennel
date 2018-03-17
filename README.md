@@ -1,6 +1,6 @@
 # paip-fennel
 Exercises from Peter Norvig's "Paradigms of Artificial Intelligence
-Programming" in Fennel, a Lisp-on-Lua
+Programming" (available [here](https://github.com/norvig/paip-lisp#paradigms-of-artificial-intelligence-programming), though I'm using a paper copy) in Fennel, a Lisp-on-Lua
 
 ## Goals
 To learn Fennel better by doing a project with it. PAIP is an
