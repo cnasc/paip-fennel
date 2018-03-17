@@ -35,3 +35,26 @@
               [ (. tbl (math.random (# tbl))) ]))
 
 (inspect (sentence)) ;; => { "the", "man", "hit", "a", "man" } (will vary)
+
+;; 2.3 -- A Rule-Based Solution
+
+;; Make it easier to write grammar rules. This approach is more
+;; data-driven and requires less code when things change.
+
+;; Are earmuffs good Fennel style? I think it's helpful to call out
+;; global variables.
+(set *simple-grammar* {:sentence [:noun-phrase :verb-phrase]
+                       :noun-phrase [:article :noun]
+                       :verb-phrase [:verb :noun-phrase]
+                       :article ["the" "a"]
+                       :noun ["man" "ball" "woman" "table"]
+                       :verb ["hit" "took" "saw" "liked"]})
+
+(set *grammar* *simple-grammar*)
+
+;; we're using a real associative array here, so no need for `assoc`
+;; `.` will do quite nicely.
+;; Also we can do this in just one function now, rather than 3
+(set rewrites (fn [category] (. *grammar* category)))
+
+
