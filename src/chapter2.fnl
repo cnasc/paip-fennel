@@ -23,6 +23,11 @@
              (table.insert result val)))
          result)))
 
+(set mappend
+     (fn [f tbl]
+       "Apply f to each element of the list and append the results"
+       (append (table.unpack (map f tbl)))))
+
 (set sentence (fn [] (append (noun-phrase) (verb-phrase))))
 (set noun-phrase (fn [] (append (article) (noun))))
 (set verb-phrase (fn [] (append (verb) (noun-phrase))))
