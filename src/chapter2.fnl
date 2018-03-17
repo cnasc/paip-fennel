@@ -30,9 +30,10 @@
 (set noun (fn [] (one-of ["man" "ball" "woman" "table"])))
 (set verb (fn [] (one-of ["hit" "took" "saw" "liked"])))
 
-(set one-of (fn [tbl]
-              "Assuming that tbl is array-like (only integer keys)"
-              [ (. tbl (math.random (# tbl))) ]))
+(set one-of
+     (fn [tbl]
+       "Assuming that tbl is array-like (only integer keys)"
+       [ (. tbl (math.random (# tbl))) ]))
 
 (inspect (sentence)) ;; => { "the", "man", "hit", "a", "man" } (will vary)
 
