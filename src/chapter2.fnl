@@ -83,3 +83,10 @@
        (if (table? phrase) (mappend generate phrase)
            (rewrites phrase) (generate (random-elt (rewrites phrase)))
            :else [ phrase ])))
+
+(inspect (generate :sentence)) ;; => { "the", "table", "hit", "a", "ball" }
+(inspect (generate :noun-phrase)) ;; => { "the", "table" }
+(inspect (generate :verb-phrase)) ;; => { "took", "the", "ball" }
+(inspect (generate :article)) ;; => { "a" }
+(inspect (generate :noun)) ;; => { "ball" }
+(inspect (generate :verb)) ;; => { "hit" }
