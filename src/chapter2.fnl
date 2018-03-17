@@ -23,10 +23,20 @@
              (table.insert result val)))
          result)))
 
+(set map
+     (fn [f tbl]
+       "Creates a new table from the results of applying `f` to each element of tbl"
+       (let [result []]
+         (each [i v (ipairs tbl)]
+           (table.insert result (f v)))
+         result)))
+
 (set mappend
      (fn [f tbl]
        "Apply f to each element of the list and append the results"
        (append (table.unpack (map f tbl)))))
+
+(set table? (fn [x] (= (type x) :table)))
 
 (set sentence (fn [] (append (noun-phrase) (verb-phrase))))
 (set noun-phrase (fn [] (append (article) (noun))))
@@ -35,10 +45,14 @@
 (set noun (fn [] (one-of ["man" "ball" "woman" "table"])))
 (set verb (fn [] (one-of ["hit" "took" "saw" "liked"])))
 
+(set random-elt
+     (fn [tbl]
+       (. tbl (math.random (# tbl)))))
+
 (set one-of
      (fn [tbl]
        "Assuming that tbl is array-like (only integer keys)"
-       [ (. tbl (math.random (# tbl))) ]))
+       [ (random-elt tbl) ]))
 
 (inspect (sentence)) ;; => { "the", "man", "hit", "a", "man" } (will vary)
 
@@ -49,9 +63,9 @@
 
 ;; Are earmuffs good Fennel style? I think it's helpful to call out
 ;; global variables.
-(set *simple-grammar* {:sentence [:noun-phrase :verb-phrase]
-                       :noun-phrase [:article :noun]
-                       :verb-phrase [:verb :noun-phrase]
+(set *simple-grammar* {:sentence [[:noun-phrase :verb-phrase]]
+                       :noun-phrase [[:article :noun]]
+                       :verb-phrase [[:verb :noun-phrase]]
                        :article ["the" "a"]
                        :noun ["man" "ball" "woman" "table"]
                        :verb ["hit" "took" "saw" "liked"]})
@@ -63,4 +77,9 @@
 ;; Also we can do this in just one function now, rather than 3
 (set rewrites (fn [category] (. *grammar* category)))
 
-
+(set generate
+     (fn [phrase]
+       "Generate a random sentence or phrase."
+       (if (table? phrase) (mappend generate phrase)
+           (rewrites phrase) (generate (random-elt (rewrites phrase)))
+           :else [ phrase ])))
