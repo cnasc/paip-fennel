@@ -90,3 +90,13 @@
 (inspect (generate :article)) ;; => { "a" }
 (inspect (generate :noun)) ;; => { "ball" }
 (inspect (generate :verb)) ;; => { "hit" }
+
+;; Exercise 2.1 -- Write a version of generate that uses cond but
+;; avoids calling `rewrites` twice
+(set generate21
+     (fn [phrase]
+       "Generate a random sentence or phrase."
+       (let [rws (rewrites phrase)]
+         (if (table? phrase) (mappend generate phrase)
+             rws (generate (random-elt rws))
+             :else [ phrase ]))))
