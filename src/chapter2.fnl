@@ -100,3 +100,32 @@
          (if (table? phrase) (mappend generate phrase)
              rws (generate (random-elt rws))
              :else [ phrase ]))))
+
+;; -star suffix because non alphanumeric chars aren't allowed in
+;; -:keywords at the moment
+(set *bigger-grammar* {:sentence [[:noun-phrase :verb-phrase]]
+                       :noun-phrase [[:article :adj-star :noun :pp-star] [:name] [:pronoun]]
+                       :verb-phrase [[:verb :noun-phrase :pp-star]]
+                       :pp-star [[] [:pp :pp-star]]
+                       :adj-star [[] [:adj :adj-star]]
+                       :pp [[:prep :noun-phrase]]
+                       :prep ["to" "in" "by" "with" "on"]
+                       :adj ["big" "little" "blue" "green" "adiabatic"]
+                       :article ["the" "a"]
+                       :name ["Pat" "Kim" "Lee" "Terry" "Robin"]
+                       :noun ["man" "ball" "woman" "table"]
+                       :verb ["hit" "took" "saw" "liked"]
+                       :pronoun ["he" "she" "it" "these" "those" "that"]})
+
+(set *grammar* *bigger-grammar*)
+
+;; The more complicated grammar can make more sophisticated sentences,
+;; but also is more likely to generate utter insanity.
+(inspect (generate :sentence)) ;; => { "Pat", "took", "Kim", "in",
+                               ;; "the", "table", "on", "he", "in",
+                               ;; "Kim", "on", "that", "in", "a",
+                               ;; "woman", "by", "the", "little",
+                               ;; "table", "with", "these", "to",
+                               ;; "the", "table", "by", "these" }
+
+
