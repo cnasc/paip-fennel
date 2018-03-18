@@ -101,8 +101,9 @@
              rws (generate (random-elt rws))
              :else [ phrase ]))))
 
-;; -star suffix because non alphanumeric chars aren't allowed in
-;; -:keywords at the moment
+;; All non-space chars are now allowed in :keywords on the Fennel
+;; master branch -- I will leave the -star suffix here until that
+;; change lands in a Luarocks release.
 (set *bigger-grammar* {:sentence [[:noun-phrase :verb-phrase]]
                        :noun-phrase [[:article :adj-star :noun :pp-star] [:name] [:pronoun]]
                        :verb-phrase [[:verb :noun-phrase :pp-star]]
