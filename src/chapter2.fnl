@@ -129,4 +129,11 @@
                                ;; "table", "with", "these", "to",
                                ;; "the", "table", "by", "these" }
 
+(set generate-tree
+     (fn [phrase]
+       "Generate a random sentence or phrase, with a complete parse tree."
+       (print (inspect phrase))
+       (if (table? phrase) (map generate-tree phrase)
+           (rewrites phrase)  { phrase (generate-tree (random-elt (rewrites phrase))) }
+           :else phrase)))
 
