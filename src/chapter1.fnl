@@ -5,14 +5,19 @@
 ;; 0x7fa5df500fc0"
 (global inspect (require :inspect))
 
+;; Typically it would be considered bad form to use a lot of globals,
+;; but due to the way Lua works, it seems impossible to have a nice
+;; repl-driven workflow without them. So we'll endeavor to keep them
+;; to a minimum and nicely namespace things.
+
 ;; These 2 lines will allow us to require Fennel files.
 ;; package.searchers in Lua 5.2+, package.loaders in Lua 5.1
 (global fennel (require :fennel))
 (table.insert package.searchers fennel.searcher)
 
-;; Require a module of helper functions written in Fennel
-(set helpers (require :helpers))
-(set h (require :help-test))
+;; Lume is a neat Lua library that is focused on game development, but
+;; which has a number of functions we'll find handy.
+(global lume (require :lume))
 
 ;; 1.1 Symbolic Computation
 ;; Lists like (list 1 2 3) or '(1 2 3) are fundamental in Common Lisp.
@@ -22,7 +27,7 @@
 ;; (append '(Pat Kim) '(Robin Sandy)) => (PAT KIM ROBIN SANDY)
 ;; There is no equivalent to `append` in Lua/Fennel.
 ;; So let's define one:
-(set append
+(global append
      (fn [...] ; [1]
        "Return a new table containing the concatenation of all tables in `...`"
        (let [result []
@@ -47,24 +52,24 @@
 ;; shorthand for a string with no spaces)
 (inspect :hot-dogs) ;; => "hot-dogs"
 
-(set p [:John :Q :Public]) ;; defining a variable doesn't return anything
+(global p [:John :Q :Public]) ;; defining a variable doesn't return anything
 (inspect p) ;; => { "John", "Q", "Public" }
 
-(set x 10)
+(global x 10)
 (print (+ x x)) ;; we can use print here, which is the native function
 (print (+ x (# p))) ;; `#` returns the length of an array-like table.
 
 ;; access members of tables with `.`
 (print (. p 1)) ;; => "John" (by the way, array-like tables are indexed from 1)
 
-(set copy
+(global copy
      (fn [tbl]
        (let [result []]
          (each [i v (ipairs tbl)]
            (table.insert result v))
          result)))
 
-(set cons
+(global cons
      (fn [val tbl]
        (let [result (copy tbl)]
          (table.insert result 1 val)
@@ -75,7 +80,7 @@
 ;; probably to use a library, but just for fun we'll implement a basic
 ;; (only operates on one table) version of it
 
-(set map
+(global map
      (fn [f tbl]
        "Creates a new table from the results of applying `f` to each element of tbl"
        (let [result []]
@@ -83,12 +88,12 @@
            (table.insert result (f v)))
          result)))
 
-(set mappend
+(global mappend
      (fn [f tbl]
        "Apply f to each element of the list and append the results"
        (append (table.unpack (map f tbl)))))
 
-(set self-and-double
+(global self-and-double
      (fn [x]
        [ x (+ x x) ]))
 
@@ -99,7 +104,7 @@
 ;; Given a list of elements, return a list consisting of all the
 ;; numbers in the original list and the negation of those numbers.
 
-(set number-and-negation
+(global number-and-negation
      (fn [x]
        (if (= (type x) :number)
          [ x (- x) ]
@@ -112,20 +117,20 @@
 ;; 1.2 Write a function to exponentiate a number to an integer power
 ;; ex. (power 3 2) => 9
 
-(set even?
+(global even?
      (fn [x]
        (= (% x 2) 0)))
 
-(set power-cheat (fn [b e] (^ b e)))
+(global power-cheat (fn [b e] (^ b e)))
 
-(set power-rec
+(global power-rec
      (fn [b e]
        (if (= e 0) 1
            (even? e) (let [x (power-rec b (/ e 2))]
                        (* x x))
            :else (* b (power-rec b (- e 1))))))
 
-(set power-iter
+(global power-iter
      (fn [b e]
        (if (even? e) (let [x (power-iter b (/ e 2))]
                        (* x x))
@@ -135,7 +140,7 @@
              result))))
 
 ;; Lua/Fennel has proper tail calls!
-(set power-tail
+(global power-tail
      (fn [b e ?acc]
        (if (<= e 0) (or ?acc 1)
            (even? e) (let [x (power-tail b (/ e 2))]
@@ -147,9 +152,9 @@
 ;; expression. In Common Lisp, nil is both an atom and a list. Not so
 ;; in Fennel.
 ;; ex. (count-atoms [:a [:b] :c]) => 3
-(set table? (fn [x] (= (type x) :table)))
+(global table? (fn [x] (= (type x) :table)))
 
-(set count-atoms
+(global count-atoms
      (fn [tbl]
        (let [result 0]
          (each [i v (ipairs tbl)]
@@ -164,7 +169,7 @@
 ;; expression.
 ;; ex. (count-anywhere :a [:a [[:a] :b] :a]) => 3
 
-(set count-anywhere
+(global count-anywhere
      (fn [needle haystack]
        (let [result 0]
          (each [i v (ipairs haystack)]
@@ -177,7 +182,7 @@
 ;; 1.5 Write a function to compute the dot product of two sequences of numbers.
 ;; (dot-product [10 20] [3 4]) => 110
 
-(set dot-product
+(global dot-product
      (fn [s1 s2]
        (let [result 0]
          (for [i 1 (# s1)]
@@ -201,5 +206,12 @@ Key differences:
   interesting to benchmark them.
   What should the idiom be? Prefer lambda for safety and only
   drop down to fn for frequently called functions after profiling?
+
+Repl workflow:
+- Rather than evaluating on a function-by-function basis (ala Slime,
+  etc.), I think that the best experience would be to write code as
+  namespaced modules and then have a workspace where they are required
+  into global tables and then hotswapped after changes are made. It's
+  not the prettiest thing, but it works.
 
 #|
