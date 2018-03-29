@@ -1,11 +1,18 @@
 ;;; PAIP in Fennel -- Chapter 1
 
-;; `set` creates global variables
-;; It's probably better to use local variables, but for the sake of
-;; readability, I will pollute the global namespace here a bit.
-;; Lua/Fennel doesn't print tables readably by default, so I've pulled
-;; in a third-party library to allow us to see our operations on tables.
-(set inspect (require :inspect))
+;; inspect is a third-party library that prints out Lua tables nicely.
+;; Without it, printing a table would result in something like "table:
+;; 0x7fa5df500fc0"
+(global inspect (require :inspect))
+
+;; These 2 lines will allow us to require Fennel files.
+;; package.searchers in Lua 5.2+, package.loaders in Lua 5.1
+(global fennel (require :fennel))
+(table.insert package.searchers fennel.searcher)
+
+;; Require a module of helper functions written in Fennel
+(set helpers (require :helpers))
+(set h (require :help-test))
 
 ;; 1.1 Symbolic Computation
 ;; Lists like (list 1 2 3) or '(1 2 3) are fundamental in Common Lisp.
